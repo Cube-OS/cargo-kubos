@@ -29,18 +29,16 @@ fn target_converter(kubos_target: &str) -> String {
         X86_TARGET_STR => String::from("x86_64-unknown-linux-gnu"),
         "kubos-linux-beaglebone-gcc" => String::from("arm-unknown-linux-gnueabihf"),
         "kubos-linux-pumpkin-mbm2-gcc" => String::from("arm-unknown-linux-gnueabihf"),
-        "kubos-linux-isis-gcc" => String::from("arm-unknown-linux-gnueabi"),
-        _ => {
-            panic!(
-                "Target '{}' not supported for cargo/yotta builds\
-                 \nCurrently supported targets are:\
-                 \nx86-linux-native\
-                 \nkubos-linux-beaglebone-gcc\
-                 \nkubos-linux-pumpkin-mbm2-gcc\
-                 \nkubos-linux-isis-gcc",
-                kubos_target
-            )
-        }
+        "kubos-linux-isis-gcc" => String::from("armv5te-unknown-linux-gnueabi"),
+        _ => panic!(
+            "Target '{}' not supported for cargo/yotta builds\
+             \nCurrently supported targets are:\
+             \nx86-linux-native\
+             \nkubos-linux-beaglebone-gcc\
+             \nkubos-linux-pumpkin-mbm2-gcc\
+             \nkubos-linux-isis-gcc",
+            kubos_target
+        ),
     }
 }
 
@@ -97,7 +95,7 @@ fn main() {
     // Collect extra parametrs
     let extra_params = if !matches.free.is_empty() {
         let mut params = matches.free.clone();
-        // remove extra kubos pamatere
+        // remove extra kubos parameter
         params.retain(|x| x != "kubos");
         params
     } else {
