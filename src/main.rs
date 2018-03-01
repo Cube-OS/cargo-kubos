@@ -92,10 +92,10 @@ fn main() {
         }
     };
 
-    // Collect extra parametrs
+    // Collect extra parameters
     let extra_params = if !matches.free.is_empty() {
         let mut params = matches.free.clone();
-        // remove extra kubos parameter
+        // Remove extra kubos parameter
         params.retain(|x| x != "kubos");
         params
     } else {
