@@ -58,7 +58,7 @@ fn cargo_command(target: String, command: String, mut extra_params: Vec<String>)
     // Attempt to exit in a way which
     // honors the subprocess exit code
     if status.success() {
-        exit(1)
+        exit(0)
     }
     exit(status.code().unwrap());
 }
