@@ -67,7 +67,7 @@ fn cargo_command(target: String, command: String, mut extra_params: Vec<String>)
 fn print_usage(opts: Options) {
     let brief = "cargo-kubos is a helper utility for running \
         Cargo commands with a Kubos target attached.\nIt is \
-        used when building/running/testing crates which either\
+        used when building/running/testing crates which either \
         contain a yotta module or depend on one. \
         \n\nUsage:\
         \n\tcargo kubos -c [cargo command] [options] -- [cargo options]
