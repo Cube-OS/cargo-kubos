@@ -14,13 +14,11 @@
 // limitations under the License.
 //
 
-extern crate getopts;
-
 use getopts::Options;
 use std::process::{exit, Command, Stdio};
 use std::env;
 
-const X86_TARGET_STR: &'static str = "x86-linux-native";
+const X86_TARGET_STR: &str = "x86-linux-native";
 
 /// Take a kubos target and convert it
 /// to a Rust/Clang target triplet
