@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2017 Kubos Corporation
+// Copyright (C) 2019 Kubos Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License")
 // you may not use this file except in compliance with the License.
@@ -14,13 +14,11 @@
 // limitations under the License.
 //
 
-extern crate getopts;
-
 use getopts::Options;
 use std::process::{exit, Command, Stdio};
 use std::env;
 
-const X86_TARGET_STR: &'static str = "x86-linux-native";
+const X86_TARGET_STR: &str = "x86-linux-native";
 
 /// Take a kubos target and convert it
 /// to a Rust/Clang target triplet
@@ -67,7 +65,7 @@ fn cargo_command(target: String, command: String, mut extra_params: Vec<String>)
 fn print_usage(opts: Options) {
     let brief = "cargo-kubos is a helper utility for running \
         Cargo commands with a Kubos target attached.\nIt is \
-        used when building/running/testing crates which either\
+        used when building/running/testing crates which either \
         contain a yotta module or depend on one. \
         \n\nUsage:\
         \n\tcargo kubos -c [cargo command] [options] -- [cargo options]
