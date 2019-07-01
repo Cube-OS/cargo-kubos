@@ -41,28 +41,6 @@ fn target_converter(kubos_target: &str) -> String {
     }
 }
 
-fn rustup_default_target() -> Result<String, String> {
-    /* cat ~/.rustup/settings.toml
-     * default_host_triple = "x86_64-apple-darwin"
-     * default_toolchain = "stable"
-     * version = "12"
-     */
-
-    let rustup_home = env::var("RUSTUP_HOME").map_err(|e| format!("{}", e))?;
-    let rustup_settings = fs::read_to_string(format!("{}/settings.toml", rustup_home))
-        .map_err(|e| format!("{}", e))?;
-    let settings = rustup_settings
-        .parse::<Value>()
-        .map_err(|e| format!("{}", e))?;
-    let triple = settings
-        .get("default_host_triple")
-        .ok_or_else(|| String::from("no default host triple"))?;
-    triple
-        .as_str()
-        .ok_or_else(|| String::from("couldn't convert target to string"))
-        .map(String::from)
-}
-
 fn cargo_linker(target: &str) -> Result<String, String> {
     let cargo_home = env::var("CARGO_HOME").map_err(|e| format!("{}", e))?;
     let data =
@@ -91,7 +69,8 @@ fn cargo_command(target: String, command: String, mut extra_params: Vec<String>)
 
     let mut command = Command::new("cargo");
     if let Ok(linker) = cargo_linker(&params[2]) {
-        command.env("CC", linker);
+        command.env("CC", &linker);
+        command.env("CXX", &linker);
         command.env("PKG_CONFIG_ALLOW_CROSS", "1");
     }
 
@@ -155,7 +134,7 @@ fn main() {
     } else {
         let k_target = match matches.opt_str("t") {
             Some(t) => t,
-            None => rustup_default_target().unwrap_or_else(|_| String::from(X86_TARGET_STR)),
+            None => String::from(X86_TARGET_STR),
         };
         let command = matches.opt_str("c").unwrap();
         let c_target = target_converter(&k_target);
