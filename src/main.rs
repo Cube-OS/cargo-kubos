@@ -16,7 +16,8 @@
 
 use getopts::Options;
 use std::process::{exit, Command, Stdio};
-use std::env;
+use std::{env, fs};
+use toml::Value;
 
 const X86_TARGET_STR: &str = "x86-linux-native";
 
@@ -40,12 +41,40 @@ fn target_converter(kubos_target: &str) -> String {
     }
 }
 
+fn cargo_linker(target: &str) -> Result<String, String> {
+    let cargo_home = env::var("CARGO_HOME").map_err(|e| format!("{}", e))?;
+    let data =
+        fs::read_to_string(format!("{}/config", cargo_home)).map_err(|e| format!("{}", e))?;
+    let cfg = data.parse::<Value>().map_err(|e| format!("{}", e))?;
+    let targets = cfg
+        .get("target")
+        .ok_or_else(|| String::from("no targets defined"))?;
+    let target = targets
+        .get(target)
+        .ok_or_else(|| format!("target {} not defined", target))?;
+    let linker = target
+        .get("linker")
+        .ok_or_else(|| String::from("no linker found"))?;
+
+    linker
+        .as_str()
+        .ok_or_else(|| String::from("could not convert linker to string"))
+        .map(String::from)
+}
+
 /// Perform `cargo 'command'` using the proper Rust/Clang target triplet
 fn cargo_command(target: String, command: String, mut extra_params: Vec<String>) {
     let mut params = vec![command, String::from("--target"), target];
     params.append(&mut extra_params);
 
-    let status = Command::new("cargo")
+    let mut command = Command::new("cargo");
+    if let Ok(linker) = cargo_linker(&params[2]) {
+        command.env("CC", &linker);
+        command.env("CXX", &linker);
+        command.env("PKG_CONFIG_ALLOW_CROSS", "1");
+    }
+
+    let status = command
         .args(&params)
         .stdin(Stdio::inherit())
         .stdout(Stdio::inherit())
